@@ -11,4 +11,4 @@ from django_declension import declension
 
 class DeclTest(TestCase):
     def test_basic_declension(self):
-        self.assertEqual(declension('упячка').genitive,u'упячки');
+        self.assertEqual(declension(u'упячка').genitive,u'упячки');
