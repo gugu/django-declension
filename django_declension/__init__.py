@@ -2,10 +2,17 @@ from .models import Word
 from lxml import etree
 from urllib import urlencode
 from urllib2 import urlopen
+from django.core.cache import cache
 
 def declension(name):
     try:
-        return Word.objects.get(nominative = name)
+        cached_declension = cache.get('declension|' + name)
+        if cached_declension is None:
+            declension = Word.objects.get(nominative = name)
+            cache.set('declension|' + name, declension)
+            return declension
+        else:
+            return cached_declension
     except Word.DoesNotExist:
         try:
             elements = etree.parse(urlopen('http://export.yandex.ru/inflect.xml?' + urlencode(
