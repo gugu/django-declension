@@ -1,4 +1,4 @@
-from .models import Word
+from .models import Word, DeclensionFail
 from lxml import etree
 from urllib import urlencode
 from urllib2 import urlopen
@@ -6,13 +6,16 @@ from django.core.cache import cache
 
 def declension(name):
     try:
-        cached_declension = cache.get('declension|' + name)
-        if cached_declension is None:
+        declension = cache.get('declension|' + name.replace(' ','|'))
+        if declension is None:
+            if cache.get('declensionfail|' + name.replace(' ','|')):
+                return None
+            elif DeclensionFail.objects.filter(word=name).count():
+                cache.set('declensionfail|' + name.replace(' ','|'), True)
+                return None
             declension = Word.objects.get(nominative = name)
-            cache.set('declension|' + name, declension)
-            return declension
-        else:
-            return cached_declension
+        cache.set('declension|' + name.replace(' ','|'), declension)
+        return declension
     except Word.DoesNotExist:
         try:
             elements = etree.parse(urlopen('http://export.yandex.ru/inflect.xml?' + urlencode(
@@ -34,5 +37,5 @@ def declension(name):
                 prepositional = unicode(elements[5]),
             )
         else:
-            # TODO: Store unsuccessfull responses
+            DeclensionFail.objects.create(word=name)
             return None
