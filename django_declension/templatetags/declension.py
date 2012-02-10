@@ -1,5 +1,8 @@
-from django_declension import declension
+# -*- coding: utf-8 -*-
+
 from django import template
+
+from django_declension import declension
 
 register = template.Library()
 
