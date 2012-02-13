@@ -1,4 +1,4 @@
-# vim: set fileencoding=utf8 :
+# -*- coding: utf-8 -*-
 """
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
